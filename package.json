@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/web-coconfig",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Default Node.js configuration files for GasBuddy projects",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gas-buddy/coconfig.git"
+    "url": "git+https://github.com/gas-buddy/web-coconfig.git"
   },
   "keywords": [
     "typescript",
