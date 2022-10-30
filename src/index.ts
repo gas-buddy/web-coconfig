@@ -9,11 +9,31 @@ Object.assign(config['tsconfig.json'].configuration.compilerOptions, {
   jsx: 'preserve',
 });
 
+const eslint = config['.eslintrc.js'].configuration as any;
+
 export default {
   ...config,
   'next.config.js': {
     configuration: {
       distDir: 'private',
+    },
+  },
+  '.eslintrc.js': {
+    configuration: {
+      ...eslint,
+      rules: {
+        ...eslint.rules,
+        'import/extensions': [
+          'off',
+          'ignorePackages',
+          {
+            js: 'never',
+            jsx: 'never',
+            ts: 'never',
+            tsx: 'never',
+          },
+        ],
+      },
     },
   },
 };
