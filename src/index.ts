@@ -12,8 +12,10 @@ Object.assign(config['tsconfig.json'].configuration.compilerOptions, {
 export default {
   ...config,
   'next.config.js': {
-    config: {
-      distDir: 'private',
+    configuration: {
+      config: {
+        distDir: 'private',
+      },
     },
   },
 };
