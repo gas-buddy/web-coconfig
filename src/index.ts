@@ -6,7 +6,7 @@ Object.assign(config['tsconfig.json'].configuration.compilerOptions, {
   forceConsistentCasingInFileNames: true,
   noEmit: false,
   resolveJsonModule: true,
-  jsx: true,
+  jsx: 'preserve',
 });
 
 export default {
