@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/web-coconfig",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Default Node.js configuration files for GasBuddy projects",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -12,7 +12,7 @@
     "lint": "eslint src",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable",
-    "postinstall": "coconfig && husky install"
+    "postinstall": "yarn dlx -p @gasbuddy/coconfig -p coconfig coconfig && husky install"
   },
   "config": {
     "coconfig": "@gasbuddy/coconfig"
