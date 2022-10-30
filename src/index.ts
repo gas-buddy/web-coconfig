@@ -13,9 +13,7 @@ export default {
   ...config,
   'next.config.js': {
     configuration: {
-      config: {
-        distDir: 'private',
-      },
+      distDir: 'private',
     },
   },
 };
