@@ -441,10 +441,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gasbuddy/coconfig@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@gasbuddy/coconfig@npm:1.3.0"
-  checksum: ee4c922e0d67adff3673f99fb34c527681bfcd32945ff49a1b694cd0dc4511a7b9ce810ba3d4d33ece451118b5ed60eb08d7c0618eb8d90f70c7621c1a6873ee
+"@gasbuddy/coconfig@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "@gasbuddy/coconfig@npm:1.3.1"
+  checksum: 9d6c7985e9de83b08556f4ec5311f98b7e43887abf946bc71cb2675213b25adf8b73b9da511a3033bee8b31158bb4564769d4b28324201f843c1932caa3c5509
   languageName: node
   linkType: hard
 
@@ -452,7 +452,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@gasbuddy/web-coconfig@workspace:."
   dependencies:
-    "@gasbuddy/coconfig": ^1.3.0
+    "@gasbuddy/coconfig": ^1.3.1
     "@types/jest": ^29.2.0
     eslint: ^8.26.0
     eslint-config-gasbuddy: ^7.0.3
