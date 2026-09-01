@@ -37,10 +37,12 @@ jobs:
       - uses: actions/checkout@v1
 
       # npm trusted publishing (OIDC) needs npm >=11.5.1, which requires Node
-      # >=22.14.0 per npm's docs.
+      # >=22.14.0 per npm's docs -- but Node 22 itself only bundles npm ~10.9.x
+      # (verified), well below that floor. Node 24 is used here instead; ubuntu-latest
+      # has it readily available.
       - uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org/
       - run: yarn install --immutable
       - run: yarn build
@@ -52,9 +54,10 @@ jobs:
       # Dist-tag derivation: a bare `npm publish` always tags `latest`, which would
       # move `latest` onto any future pre-release (e.g. a `-beta.x`) for every
       # consumer with no version pin. Pin the npm version exactly (not npm@latest) --
-      # Node 22 bundles npm ~10.x, which doesn't support OIDC at all, and an unpinned
-      # `npm@latest` has already crossed into npm 12, which drops Node 22 support
-      # below its own newer floor.
+      # Node's own bundled npm can be well below the OIDC floor regardless of Node
+      # major (verified: Node 22 ships npm ~10.9.x), and an unpinned `npm@latest` has
+      # already crossed into npm 12, which drops support for Node versions below its
+      # own newer floor.
       - name: Publish package
         run: |
           VERSION=$(node -p "require('./package.json').version")
