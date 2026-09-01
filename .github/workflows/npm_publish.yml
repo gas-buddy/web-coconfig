@@ -5,15 +5,22 @@ on:
     branches:
       - main
 
+permissions: {}
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v1
 
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      # @gasbuddy/coconfig (this repo's only @gasbuddy dependency) is a public scoped
+      # package -- `npm view @gasbuddy/coconfig` succeeds with no auth -- so installs
+      # here never needed a read token.
       - run: yarn install --immutable
       - run: yarn build
       - run: yarn lint
@@ -23,17 +30,34 @@ jobs:
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v1
 
+      # npm trusted publishing (OIDC) needs npm >=11.5.1, which requires Node
+      # >=22.14.0 per npm's docs.
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 22
           registry-url: https://registry.npmjs.org/
       - run: yarn install --immutable
       - run: yarn build
 
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-
+      # No NODE_AUTH_TOKEN -- id-token: write above lets npm exchange a GitHub OIDC
+      # token for publish rights instead. A leftover token would make npm use it and
+      # skip the OIDC exchange entirely.
+      #
+      # Dist-tag derivation: a bare `npm publish` always tags `latest`, which would
+      # move `latest` onto any future pre-release (e.g. a `-beta.x`) for every
+      # consumer with no version pin. Pin the npm version exactly (not npm@latest) --
+      # Node 22 bundles npm ~10.x, which doesn't support OIDC at all, and an unpinned
+      # `npm@latest` has already crossed into npm 12, which drops Node 22 support
+      # below its own newer floor.
+      - name: Publish package
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          NPM_TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] || 'latest'")
+          echo "Publishing $VERSION with dist-tag: $NPM_TAG"
+          npx -y npm@11.19.0 publish --access public --tag "$NPM_TAG"
