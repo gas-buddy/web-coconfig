@@ -6,11 +6,11 @@
 
 Default Node.js configuration files for GasBuddy web projects. Uses [coconfig](/gas-buddy/coconfig) to create a pile of configuration files.
 
-## v2: v23 web TypeScript baseline (webpack + babel SSR React apps)
+## Next major (Unreleased): v23 web TypeScript baseline (webpack + babel SSR React apps)
 
-As of v2, this package targets the gb-services v23 web stack: server-rendered React apps built with webpack 5 + `@gasbuddy/gb-web-app` v3 and compiled through Babel (not `tsc` emit, and **not** Next.js -- Next apps should stay on `@gasbuddy/coconfig` directly, or a future Next-specific variant). `designer-web` is the reference/adoption target this config is designed to match.
+As of the next major (Unreleased), this package targets the gb-services v23 web stack: server-rendered React apps built with webpack 5 + `@gasbuddy/gb-web-app` v3 and compiled through Babel (not `tsc` emit, and **not** Next.js -- Next apps should stay on `@gasbuddy/coconfig` directly, or a future Next-specific variant). `designer-web` is the reference/adoption target this config is designed to match.
 
-On top of `@gasbuddy/coconfig`'s base, `@gasbuddy/web-coconfig` v2:
+On top of `@gasbuddy/coconfig`'s base, `@gasbuddy/web-coconfig`'s next major (Unreleased):
 
 - Overrides `tsconfig.json` for a mixed JS/TS, no-emit setup: `noEmit: true` (Babel does the real build; `tsc --noEmit` is a type-check-only gate), `allowJs: true` / `checkJs: false`, `moduleResolution: 'node'`, `lib: ['ES2022', 'DOM', 'DOM.Iterable']`, `jsx: 'react-jsx'`, `resolveJsonModule`, `skipLibCheck`, `forceConsistentCasingInFileNames`, and `include`/`exclude` scoped to `src`, `tests`, `types`, `.storybook` (not the base's `__tests__`/`__mocks__`/`coconfig.ts`, which are this package's own dev conventions, not a web app's).
 - Emits a new `types/web-globals.d.ts` with ambient module declarations for `*.css` (CSS Modules, `Record<string, string>` default export), `*.svg`/`*.png`/`*.gif`/`*.jpg` (asset imports, `string` default export), and an interim `@gasbuddy/react-components` + `@gasbuddy/react-components/reset.css` shim (marked `TODO(remove when @gasbuddy/react-components ships .d.ts)` -- tracked separately).
@@ -31,7 +31,7 @@ Like the base `@gasbuddy/coconfig`, this only runs on `postinstall` if the consu
     "postinstall": "yarn dlx -p @gasbuddy/web-coconfig -p coconfig coconfig"
   },
   "dependencies": {
-    "@gasbuddy/web-coconfig": "^2.0.0"
+    "@gasbuddy/web-coconfig": "^1.3.0"
   }
 }
 ```
