@@ -36,8 +36,9 @@ test('types/web-globals.d.ts is emitted with the expected ambient declarations',
   expect(entry.content).toContain("declare module '*.png'");
   expect(entry.content).toContain("declare module '*.gif'");
   expect(entry.content).toContain("declare module '*.jpg'");
-  expect(entry.content).toContain("declare module '@gasbuddy/react-components'");
-  expect(entry.content).toContain("declare module '@gasbuddy/react-components/reset.css'");
+  // No package shims: @gasbuddy/react-components ships real .d.ts (9.1+), and a bare
+  // ambient declare-module silently shadows real published types.
+  expect(entry.content).not.toContain('@gasbuddy/react-components');
 });
 
 test('.eslintrc.js extends the web config and widens the test/story override globs', () => {
@@ -48,4 +49,11 @@ test('.eslintrc.js extends the web config and widens the test/story override glo
   );
   expect(widenedOverride).toBeTruthy();
   expect(widenedOverride.rules['max-len']).toBe('off');
+});
+
+test('.eslintignore gains web build outputs on top of the base list', () => {
+  const entry = (config as any)['.eslintignore'] as string;
+  expect(entry).toContain('build-static/');
+  expect(entry).toContain('storybook-static/');
+  expect(entry).toContain('build/');
 });

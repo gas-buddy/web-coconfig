@@ -48,6 +48,6 @@
   },
   "packageManager": "yarn@3.2.4",
   "dependencies": {
-    "@gasbuddy/coconfig": "^1.4.0"
+    "@gasbuddy/coconfig": "^2.0.0"
   }
 }
