@@ -5,14 +5,21 @@ on:
     branches:
       - main
 
+permissions: {}
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
+      # @gasbuddy/coconfig (this repo's only @gasbuddy dependency) is a public scoped
+      # package -- `npm view @gasbuddy/coconfig` succeeds with no auth -- so installs
+      # here never needed a read token.
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -21,23 +28,39 @@ jobs:
       - run: yarn lint
       - run: yarn test
 
-
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
+      # npm trusted publishing (OIDC) needs npm >=11.5.1. Node 22 only bundles npm
+      # ~10.9.x (verified), below that floor -- Node 24 bundles npm 11.6+. The publish
+      # command still pins npm exactly via npx (never npm@latest: npm 12 drops older
+      # Node support and an unpinned resolve would silently pick it up).
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version: 24
           registry-url: https://registry.npmjs.org/
       - run: yarn install --immutable
       - run: yarn build
 
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-
+      # No NODE_AUTH_TOKEN -- id-token: write above lets npm exchange a GitHub OIDC
+      # token for publish rights instead. A leftover token would make npm use it and
+      # skip the OIDC exchange entirely. Bare `npm publish` always tags `latest`, so
+      # the dist-tag is derived from the version (pre-releases land on their own tag).
+      - name: Publish package
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          NPM_TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] || 'latest'")
+          if npx -y npm@11.19.0 view "@gasbuddy/web-coconfig@$VERSION" version >/dev/null 2>&1; then
+            echo "Version $VERSION already published -- skipping"
+            exit 0
+          fi
+          echo "Publishing $VERSION with dist-tag: $NPM_TAG"
+          npx -y npm@11.19.0 publish --access public --tag "$NPM_TAG"
