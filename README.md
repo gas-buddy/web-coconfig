@@ -6,7 +6,7 @@
 
 Default Node.js configuration files for GasBuddy web projects. Uses [coconfig](/gas-buddy/coconfig) to create a pile of configuration files.
 
-## Next major (Unreleased): v23 web TypeScript baseline (webpack + babel SSR React apps)
+## v2.0.0: GB-services v23 web TypeScript baseline (webpack + babel SSR React apps)
 
 As of the next major (Unreleased), this package targets the gb-services v23 web stack: server-rendered React apps built with webpack 5 + `@gasbuddy/gb-web-app` v3 and compiled through Babel (not `tsc` emit, and **not** Next.js -- Next apps should stay on `@gasbuddy/coconfig` directly, or a future Next-specific variant). `designer-web` is the reference/adoption target this config is designed to match.
 
