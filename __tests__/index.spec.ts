@@ -1,4 +1,4 @@
-import config from '../src';
+import config, { nextConfig } from '../src';
 
 test('index', () => {
   expect(config).toBeTruthy();
@@ -22,11 +22,11 @@ test('tsconfig overrides are applied for the v23 web (webpack+babel SSR) baselin
 });
 
 test('next.config.js is not emitted (this is the webpack+babel SSR baseline, not Next.js)', () => {
-  expect(config).not.toHaveProperty('next.config.js');
+  expect(config).not.toHaveProperty(['next.config.js']);
 });
 
 test('the base single ts-jest jest.config.js is suppressed (web apps own two-tier configs)', () => {
-  expect(config).not.toHaveProperty('jest.config.js');
+  expect(config).not.toHaveProperty(['jest.config.js']);
 });
 
 test('types/web-globals.d.ts is emitted with the expected ambient declarations', () => {
@@ -56,4 +56,49 @@ test('.eslintignore gains web build outputs on top of the base list', () => {
   expect(entry).toContain('build-static/');
   expect(entry).toContain('storybook-static/');
   expect(entry).toContain('build/');
+});
+
+describe('nextConfig (Next.js variant)', () => {
+  test('emits next.config.js with the private distDir', () => {
+    expect(nextConfig).toHaveProperty(['next.config.js']);
+    expect((nextConfig as any)['next.config.js'].configuration).toEqual({ distDir: 'private' });
+  });
+
+  test('keeps the base ts-jest jest.config.js (Next apps run gb-jest, not the two-tier web setup)', () => {
+    expect(nextConfig).toHaveProperty(['jest.config.js']);
+  });
+
+  test('tsc still emits and leaves JSX for Next to transform', () => {
+    const { compilerOptions } = (nextConfig as any)['tsconfig.json'].configuration;
+    expect(compilerOptions).toMatchObject({
+      jsx: 'preserve',
+      noEmit: false,
+      module: 'CommonJS',
+      resolveJsonModule: true,
+    });
+  });
+
+  test('keeps the base service-shaped include rather than the React one', () => {
+    const tsconfig = (nextConfig as any)['tsconfig.json'].configuration;
+    expect(tsconfig.include).toContain('__tests__/**/*');
+    expect(tsconfig.include).not.toEqual(['src', 'tests', 'types', '.storybook']);
+  });
+
+  test('does not emit types/web-globals.d.ts (Next covers it via next-env.d.ts)', () => {
+    expect(nextConfig).not.toHaveProperty(['types/web-globals.d.ts']);
+    expect(config).toHaveProperty(['types/web-globals.d.ts']);
+  });
+
+  // Both variants edit tsconfig, and the base config object they start from is a
+  // shared module-level singleton -- so this guards against one variant's
+  // Object.assign leaking into the other.
+  test('does not pollute the React variant', () => {
+    const react = (config as any)['tsconfig.json'].configuration.compilerOptions;
+    const next = (nextConfig as any)['tsconfig.json'].configuration.compilerOptions;
+    expect(react.jsx).toBe('react-jsx');
+    expect(next.jsx).toBe('preserve');
+    expect(react.noEmit).toBe(true);
+    expect(next.noEmit).toBe(false);
+    expect(config).not.toHaveProperty(['next.config.js']);
+  });
 });
